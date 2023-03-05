@@ -20,7 +20,7 @@ def get_hand_landmarks_from_image(image_path): # './test_images/face_image_1.jpg
     return results.multi_hand_landmarks
 
 
-def draw_hand_landmarks_from_image(image_path, hand_landmarks,
+def draw_hand_landmarks(image_path, hand_landmarks,
                                    output_image_path):
     mp_hands = mp.solutions.hands
     mp_drawing = mp.solutions.drawing_utils
@@ -42,7 +42,7 @@ def draw_hand_landmarks_from_image(image_path, hand_landmarks,
     cv2.imwrite(output_image_path, cv2.flip(annotated_image, 1))
 
 
-def get_lower_bound_hands_pixels(image_path):
+def get_lower_bound_hands(image_path):
     mp_hands = mp.solutions.hands
     hands = get_hand_landmarks_from_image(image_path)
 
