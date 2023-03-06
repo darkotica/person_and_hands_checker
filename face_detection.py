@@ -1,14 +1,15 @@
 import cv2
 import mediapipe as mp
+from exceptions import FaceDetectionException
 
 
-def draw_face_detections(image_path, detections, output_path):
+def draw_face_detections(image_path, output_path):
     mp_drawing = mp.solutions.drawing_utils
     mp_face_detection = mp.solutions.face_detection
 
     image = cv2.imread(image_path)
 
-    for detection in detections:
+    for detection in get_face_detections(image_path):
         print('Nose tip:')
         print(mp_face_detection.get_key_point(
           detection, mp_face_detection.FaceKeyPoint.NOSE_TIP))
@@ -33,27 +34,25 @@ def get_face_detections(image_path):
         return results.detections
 
 
-def get_upper_bound_head(image_path):
+def get_head_upper_bound(image_path, num_of_heads):
     detections = get_face_detections(image_path)
 
-    if len(detections) != 1:
-        return None
+    if len(detections) != num_of_heads:
+        raise FaceDetectionException(
+            "Incorrect number of faces detected on a photo! "
+            "Number required: {}, number detected {}".format(num_of_heads,
+                                                             len(detections))
+            )
 
     image = cv2.imread(image_path)
     image_height, image_width, _ = image.shape
 
     bbox = detections[0].location_data.relative_bounding_box
-    upper_bound_y = (bbox.ymin - 0.1 * bbox.height) * image_height
+    upper_bound_y = bbox.ymin * image_height
 
-    # cv2.line(image, (0, int(upper_bound_y)),
-    #          (image_width, int(upper_bound_y)), (0, 255, 0),
-    #          thickness=2)
-    #
-    # cv2.imwrite("./test_images/head_line.png", image)
+    cv2.line(image, (0, int(upper_bound_y)),
+             (image_width, int(upper_bound_y)), (255, 0, 0),
+             thickness=2)
+
+    cv2.imwrite("./test_images/head_line.png", image)
     return upper_bound_y
-
-
-# get_upper_bound_head("test_images/face_image_1.jpg")
-# draw_face_detections("test_images/face_image_1.jpg",
-#                      get_face_detections("test_images/face_image_1.jpg"),
-#                      "test_images/face_annotated_image_1.png")
