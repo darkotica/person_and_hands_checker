@@ -34,15 +34,12 @@ def get_face_detections(image_path):
         return results.detections
 
 
-def get_head_upper_bound(image_path, num_of_heads):
+def get_head_upper_bound(image_path, debug=False):
     detections = get_face_detections(image_path)
+    num_of_detections = 0 if not detections else len(detections)
 
-    if len(detections) != num_of_heads:
-        raise FaceDetectionException(
-            "Incorrect number of faces detected on a photo! "
-            "Number required: {}, number detected {}".format(num_of_heads,
-                                                             len(detections))
-            )
+    if num_of_detections == 0 or num_of_detections > 1:
+        return 0, num_of_detections
 
     image = cv2.imread(image_path)
     image_height, image_width, _ = image.shape
@@ -50,9 +47,10 @@ def get_head_upper_bound(image_path, num_of_heads):
     bbox = detections[0].location_data.relative_bounding_box
     upper_bound_y = bbox.ymin * image_height
 
-    cv2.line(image, (0, int(upper_bound_y)),
-             (image_width, int(upper_bound_y)), (255, 0, 0),
-             thickness=2)
+    if debug:
+        cv2.line(image, (0, int(upper_bound_y)),
+                 (image_width, int(upper_bound_y)), (255, 0, 0),
+                 thickness=2)
 
-    cv2.imwrite("./test_images/head_line.png", image)
-    return upper_bound_y
+        cv2.imwrite("./test_images/head_line.png", image)
+    return upper_bound_y, len(detections)
