@@ -60,14 +60,4 @@ def get_hands_bounds_pixels(image_path, debug=False):
         upper_bound_y = max(landmarks_y) * image_height
         hands_bound_pixels.append((lower_bound_y, upper_bound_y))
 
-        if debug:
-            cv2.line(image, (0, int(lower_bound_y)),
-                     (image_width, int(lower_bound_y)), (0, 255, 0),
-                     thickness=2)
-            cv2.line(image, (0, int(upper_bound_y)),
-                     (image_width, int(upper_bound_y)), (0, 255, 0),
-                     thickness=2)
-    if debug:
-        cv2.imwrite("./test_images/hand_line.png", cv2.flip(image, 1))
-
     return hands_bound_pixels
